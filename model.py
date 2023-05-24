@@ -72,7 +72,7 @@ def _preprocess_data(data):
     feature_vector_df.Valencia_pressure.fillna(mode[0],inplace = True)
 
     predict_vector = feature_vector_df[['Madrid_wind_speed','Valencia_temp', 'Seville_temp','Bilbao_rain_1h', 'Bilbao_temp_max',
-                                    'Seville_temp_min','Madrid_temp','Valencia_wind_speed', 'hour',]]
+                                    'Seville_temp_min','Madrid_temp']]
     # ------------------------------------------------------------------------
 
     return predict_vector
