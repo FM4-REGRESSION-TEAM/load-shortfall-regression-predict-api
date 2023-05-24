@@ -22,10 +22,16 @@
 """
 
 # Helper Dependencies
+from matplotlib.pyplot import axis
 import numpy as np
 import pandas as pd
+import bz2
 import pickle
 import json
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import *
+
+
 
 def _preprocess_data(data):
     """Private helper function to preprocess data for model prediction.
@@ -44,6 +50,8 @@ def _preprocess_data(data):
     Pandas DataFrame : <class 'pandas.core.frame.DataFrame'>
         The preprocessed data, ready to be used our model for prediction.
     """
+   
+
     # Convert the json string to a python dictionary object
     feature_vector_dict = json.loads(data)
     # Load the dictionary as a Pandas DataFrame.
@@ -58,22 +66,34 @@ def _preprocess_data(data):
     # ---------------------------------------------------------------
 
     # ----------- Replace this code with your own preprocessing steps --------
+    
+    # ------------------------------------------------------------------------
+
+
+
+    # create new features
     feature_vector_df['time'] = pd.to_datetime(feature_vector_df['time'])
 
     feature_vector_df['time'] = pd.to_datetime(feature_vector_df['time'], format = '%Y-%m-%d %H:%M:%S')
+    # year value is arbitrary where power is concerned
+    feature_vector_df['year'] = feature_vector_df['time'].dt.year
 
-    feature_vector_df['year'] = feature_vector_df['time'].dt.year     # year value is arbitrary where power is concerned
-    feature_vector_df['month'] = feature_vector_df['time'].dt.month   # power varies per month depending on season
-    feature_vector_df['day'] = feature_vector_df['time'].dt.day       # power varies depending on day of the week
-    feature_vector_df['hour'] = feature_vector_df['time'].dt.hour     # power varies depending on the time of the day
+    # power varies per month depending on season
+    feature_vector_df['month'] = feature_vector_df['time'].dt.month
 
-    feature_vector_df[['month', 'day', 'hour']] = feature_vector_df[['month', 'day', 'hour']].astype('int64')
+     # power varies depending on day of the week  
+    feature_vector_df['day'] = feature_vector_df['time'].dt.day
+
+    # power varies depending on the time of the day      
+    feature_vector_df['hour'] = feature_vector_df['time'].dt.hour     
+
+    feature_vector_df[['year', 'month', 'day', 'hour']] = feature_vector_df[['year','month', 'day', 'hour']].astype('int64')
+
     mode = pd.concat([feature_vector_df.Valencia_pressure]).mode()
     feature_vector_df.Valencia_pressure.fillna(mode[0],inplace = True)
 
-    predict_vector = feature_vector_df[['Madrid_wind_speed','Valencia_temp', 'Seville_temp','Bilbao_rain_1h', 'Bilbao_temp_max',
-                                    'Seville_temp_min','Madrid_temp']]
-    # ------------------------------------------------------------------------
+    predict_vector = feature_vector_df[['Madrid_wind_speed', 'Seville_temp','Bilbao_rain_1h',
+                                        'Valencia_wind_speed', 'Barcelona_rain_3h', 'year', 'month', 'day', 'hour',]]
 
     return predict_vector
 
@@ -118,7 +138,11 @@ def make_prediction(data, model):
     """
     # Data preprocessing.
     prep_data = _preprocess_data(data)
+ 
     # Perform prediction with model and preprocessed data.
+
     prediction = model.predict(prep_data)
+    
     # Format as list for output standardisation.
+
     return prediction[0].tolist()
