@@ -69,17 +69,22 @@ def _preprocess_data(data):
     
     # ------------------------------------------------------------------------
 
-
-
     # create new features
     feature_vector_df['time'] = pd.to_datetime(feature_vector_df['time'])
 
     feature_vector_df['time'] = pd.to_datetime(feature_vector_df['time'], format = '%Y-%m-%d %H:%M:%S')
 
-    feature_vector_df['year'] = feature_vector_df['time'].dt.year     # year value is arbitrary where power is concerned
-    feature_vector_df['month'] = feature_vector_df['time'].dt.month   # power varies per month depending on season
-    feature_vector_df['day'] = feature_vector_df['time'].dt.day       # power varies depending on day of the week
-    feature_vector_df['hour'] = feature_vector_df['time'].dt.hour     # power varies depending on the time of the day
+    # year value is arbitrary where power is concerned
+    feature_vector_df['year'] = feature_vector_df['time'].dt.year
+
+    # power varies per month depending on season     
+    feature_vector_df['month'] = feature_vector_df['time'].dt.month
+
+    # power varies depending on day of the week   
+    feature_vector_df['day'] = feature_vector_df['time'].dt.day
+
+    # power varies depending on the time of the day     
+    feature_vector_df['hour'] = feature_vector_df['time'].dt.hour     
 
     feature_vector_df[['year', 'month', 'day', 'hour']] = feature_vector_df[['year','month', 'day', 'hour']].astype('int64')
 
